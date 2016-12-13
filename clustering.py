@@ -5,10 +5,20 @@ import pandas
 import pylab as pl
 import scipy.cluster
 
+bad_cards = ('Collected Company', "Nissa's Pilgrimage",
+             "Knight of the White Orchid",
+             "Ojutai's Command", "Tragic Arrogance")
+
 alldecks = get_alldecks()
+
+alldecks = {date: results for date, results in alldecks.items()
+            if not any(bad in deck['mainboard'] for deck in results.values() for bad in bad_cards)}
+
+
+
 card_namespace = set(card
                      for dailies in alldecks.values()
-                     for deck in dailies.values() if 'Collected Company' not in deck['mainboard']
+                     for deck in dailies.values() if not any(x in deck['mainboard'] for x in bad_cards)
                      for card in deck['mainboard'])
 
 deckcount = sum(len(x) for x in alldecks.values())
@@ -109,15 +119,22 @@ deck_class = {'Panharmonicon': ['Panharmonicon'],
               'RB Aggro': ['Fiery Temper', 'Bomat Courier', 'Unlicensed Disintegration'],
               'UR Control': ['Torrential Gearhulk', 'Glimmer of Genius', 'Harnessed Lightning', 'Spirebluff Canal', 'Wandering Fumarole'],
               'UW Control': ['Torrential Gearhulk', 'Glimmer of Genius', 'Immolating Glare', 'Blessed Alliance'],
+              'UB Control': ['Torrential Gearhulk', 'Glimmer of Genius', 'Grasp of Darkness', 'Liliana, the Last Hope', 'Sunken Hollow'],
              }
 
 easy_decks = ('Panharmonicon', 'Metalwork Colossus', 'Aetherworks Marvel')
 
 deck_guess = {
+    'UW Panharmonicon': {'Panharmonicon':4, 'Cloudblazer':4, 'Glint-Nest Crane':4, 'Eldrazi Displacer':4, 'Drowner of Hope':2},
     'UW Control': {'Torrential Gearhulk':4, 'Glimmer of Genius':4,
                    'Immolating Glare':2, 'Blessed Alliance':2, 'Prairie Stream':4},
+    'UB Control': {'Torrential Gearhulk':4, 'Glimmer of Genius':4,
+                   'Grasp of Darkness':4,
+                   'Liliana, the Last Hope':4, 'Sunken Hollow':4,},
     'UR Control': {'Torrential Gearhulk':2, 'Glimmer of Genius':4,
                    'Harnessed Lightning':4, 'Spirebluff Canal':4, 'Wandering Fumarole':4},
+    'UR Spells': {'Lightning Axe':4, 'Tormenting Voice':4, 'Highland Lake':4, 'Spirebluff Canal':4, 'Thermo-Alchemist':4,
+                  'Stormchaser Mage':4, 'Galvanic Bombardment':4, 'Collective Defiance':4, 'Fiery Temper':4, 'Thing in the Ice':2},
     'RB Aggro': {'Fiery Temper':4, 'Bomat Courier':4, 'Unlicensed Disintegration':4,
                  "Smuggler's Copter":4},
     'RG Energy Aggro': {'Servant of the Conduit':4, 'Attune with Aether':4,
@@ -133,6 +150,19 @@ deck_guess = {
                             'Grapple with the Past': 4,
                             "Pilgrim's Eye":1,
                             'Noxious Gearhulk':1, 'Ruinous Path':1},
+    'BG Delirium Aggro': {"Smuggler's Copter":4, 'Grim Flayer':4,
+                          'Ishkanah, Grafwidow':4,
+                          "Liliana, the Last Hope":4,
+                          'Grasp of Darkness':4, 'Gnarlwood Dryad':4,
+                          'Sylvan Advocate': 2,
+                          'Dead Weight':2,
+                          'Scrapheap Scrounger':2,
+                          'Mindwrack Demon':2,
+                          'Tireless Tracker':2,
+                          'Hissing Quagmire':2,
+                          'Verdurous Gearhulk':2,
+                          'Blossoming Defense':2,
+                         },
     'UW Flash': {'Reflector Mage':4, "Gideon, Ally of Zendikar":4,
                  "Smuggler's Copter":4, "Thraben Inspector":4,
                  "Prairie Stream":4},
@@ -157,6 +187,15 @@ deck_guess = {
                                  'Harnessed Lightning':4, 'Attune with Aether':4, 'Vessel of Nascency':4,
                                  'Island':1, 'Forest': 5, 'Mountain':2,
                                  "Woodweaver's Puzzleknot":4,
+                                 "Confiscation Coup":1,
+                                 "Evolving Wilds":1,
+                             },
+    'BG Aetherworks Marvel': {'Aetherworks Marvel':4, 'Emrakul, the Promised End':4, 'Ulamog, the Ceaseless Hunger':2,
+                              'Attune with Aether':4, 'Vessel of Nascency':4,
+                              'Forest':8, 'Swamp':4,
+                              'To the Slaughter':2, 'Noxious Gearhulk':2, 'Grasp of Darkness':2, 'Blooming Marsh':2,
+                              "Servant of the Conduit":2,
+                              "Woodweaver's Puzzleknot":4,
                              },
     'Bux Graveyard': {'Haunted Dead':4, 'Prized Amalgam':4, 'Voldaren Pariah':4, 'Cryptbreaker':4,
                      },
@@ -174,6 +213,9 @@ deck_guess = {
                            "Prophetic Prism":4,
                           },
     'BW': {"Ayli, Eternal Pilgrim": 4, "Shambling Vent":4, "Forsaken Sanctuary": 2, "Concealed Courtyard": 4,},
+    'Mardu Control': {'Liliana, the Last Hope':4, 'Mountain':4, 'Swamp':4, 'Smoldering Marsh':2, 'Kalitas, Traitor of Ghet':2,
+                      'Noxious Gearhulk':2, 'Goblin Dark-Dwellers':2, 'Nahiri, the Harbinger':2, 'Grasp of Darkness':2,
+                      'Chandra, Torch of Defiance':2, 'Ruinous Path':2,},
 }
 
 # +1 for the "others"
@@ -189,6 +231,8 @@ codebook, distortion = scipy.cluster.vq.kmeans(np.array(justdata.T, 'float'), gu
 code, dist = scipy.cluster.vq.vq(np.array(justdata.T, 'int'), codebook)
 #cntr, u, u0, d, jm, p, fpc = fuzz.cluster.cmeans(
 #    data=justdata, c=ncenters, m=2, error=0.005, maxiter=1000, init=None)
+
+pd['Distortion'] = dist
 
 # Store fpc values for later
 distortions.append(distortion)
@@ -218,13 +262,19 @@ for ii in range(len(deck_guess)+1):
             name = dk
     if name is None:
         print("Deck {0}: {1} matches, {2}%".format(ii, mask.sum(), mask.sum()/len(mask)))
+        deck_ids[ii]=ii
+        deck_50_pct[ii] = mask.sum()/len(mask)
+        pd.ix[mask, 'Archetype'] = "Other "+str(ii)
     else:
         if name in deck_50_pct:
             print("**********DUPLICATE**********")
+            pd.ix[mask, 'Archetype'] = name + str(ii)
+        else:
+            pd.ix[mask, 'Archetype'] = name
         deck_50_pct[name] = mask.sum()/len(mask)
         print("Deck {0}={2}: {1} matches, {3}%".format(ii, mask.sum(), name, mask.sum()/len(mask)))
         deck_ids[name]=ii
-        pd['Archetype'][mask] = name
+        #pd['Archetype'][mask] = name
     #print(deck[-20:])
 
 print(len(deck_50_pct), deck_50_pct)
@@ -247,10 +297,14 @@ for week_start in week_starts:
         deck_matches = (pd.Archetype == deck) & date_matches
         weekly_summary[deck][week_start] = deck_matches.sum() / date_matches.sum()
 
-weekly_summary.plot(style=[x+y for x,y in zip('rgbcmykrgbcmykr', ['-']*5 + ['--']*5 + [':']*5)])
+weekly_summary.plot(style=[x+y for x,y in zip('rgbcmykrgbcmykrgbcmyk', ['-']*7 + ['--']*7 + [':']*7)])
 pl.xlabel("First date in week")
 pl.ylabel("Fraction of 5-0 decks in that week")
 
+
+def get_deck(num):
+    deck = pd.loc[num]
+    return deck[deck!=0]
 
 
 

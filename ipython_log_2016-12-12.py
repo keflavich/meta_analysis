@@ -1441,3 +1441,167 @@ get_ipython().system('open 8png')
 get_ipython().system('open *png')
 get_ipython().magic('ls -rt')
 get_ipython().system('open *png')
+dis
+dist
+dist.shape
+distortion
+get_ipython().magic('pinfo scipy.cluster.vq.vq')
+pd['Distortion'] = dist
+pd.sort_values('Distortion', inplace=True)
+pd
+pd[['Date','Archetype','Distortion']]
+pd[553]
+pd.index[553]
+pd[-1]
+pd[-1:]
+pd.loc[533]
+type(pd.loc[533])
+d533 = pd.loc[533]
+d533.unique()
+pd
+pd[['Date','Archetype','Distortion']]
+d553 = pd.loc[553]
+d553
+d553.unique()
+d553[d553 != 0]
+get_ipython().magic('run mtgo_daily.py')
+get_ipython().magic('run clustering.py')
+get_ipython().magic('run clustering.py')
+week_starts = [day for day in daterange(datetime.date(year=2016,month=10,day=1), datetime.date.today(), step=7)]
+get_ipython().magic('run mtgo_daily.py')
+week_starts = [day for day in daterange(datetime.date(year=2016,month=10,day=1), datetime.date.today(), step=7)]
+import mtgo_daily
+import imp
+imp.reload(mtgo_daily)
+week_starts = [day for day in daterange(datetime.date(year=2016,month=10,day=1), datetime.date.today(), step=7)]
+pd.sort_values('Distortion', inplace=True)
+pd
+pd.loc[601]
+d601 = pd.loc[601]
+d601[d601!=0]
+d601 = pd.loc[601]
+deck_50_pct
+get_ipython().magic('run mtgo_daily.py')
+get_ipython().magic('run clustering.py')
+pd['Archetype',mask]
+pd[('Archetype',mask)]
+pd['Archetype'].loc(mask)
+pd.loc[:,('Archetype',mask)]
+pd.ix['Archetype',mask]
+pd.ix[mask,'Archetype']
+get_ipython().magic('run clustering.py')
+get_ipython().magic('run clustering.py')
+for ii in pl.get_fignums(): pl.close(ii)
+weekly_summary.plot(style=[x+y for x,y in zip('rgbcmykrgbcmykr', ['-']*5 + ['--']*5 + [':']*5)])
+pl.xlabel("First date in week")
+pl.ylabel("Fraction of 5-0 decks in that week")
+len('rgbcmykrgbcmykrgbcmyk')
+get_ipython().magic('paste')
+weekly_summary.plot(style=[x+y for x,y in zip('rgbcmykrgbcmykrgbcmyk', ['-']*7 + ['--']*7 + [':']*7)])
+pl.xlabel("First date in week")
+pl.ylabel("Fraction of 5-0 decks in that week")
+pd.sort_values('Distortion', inplace=True)
+pd
+def get_deck(num):
+        deck = pd.loc[num]
+        return deck[deck!=0]
+
+get_deck(232)
+get_ipython().magic('paste')
+def get_deck(num):
+    deck = pd.loc[num]
+    return deck[deck!=0]
+get_ipython().magic('run clustering.py')
+pd.sort_values('Distortion', inplace=True)
+pd
+get_deck(379)
+get_ipython().magic('run clustering.py')
+pd.sort_values('Distortion', inplace=True)
+pd
+get_deck(565)
+get_deck(258)
+pd
+get_deck(248)
+get_ipython().magic('run clustering.py')
+get_ipython().magic('run clustering.py')
+pd.sort_values('Distortion', inplace=True)
+pd
+get_deck(565)
+get_deck(258)
+pd
+get_deck(274)
+get_deck(611)
+get_deck(295)
+get_deck(331)
+get_ipython().magic('run clustering.py')
+get_ipython().magic('run clustering.py')
+pd.sort_values('Distortion', inplace=True)
+pd
+get_deck(71)
+get_ipython().magic('run clustering.py')
+get_ipython().magic('run clustering.py')
+deck_ids[18]
+pd[pd['Archetype']=='18']
+pd[pd['Archetype']=='Other 18']
+get_deck(62)
+get_deck(70)
+get_deck(71)
+pd.shape
+alldecks
+alldecks.keys()
+akkdecks['2016-10-01']
+alldecks['2016-10-01']
+len(alldecks)
+alldecks = {date: results for date, results in alldecks.items()
+            if not any(bad in deck for deck in results.values() for bad in bad_cards)}
+bad_cards = ('Collected Company', "Nissa's Pilgrimage",
+             "Knight of the White Orchid",
+             "Ojutai's Command", "Tragic Arrogance")
+alldecks = get_alldecks()
+alldecks = {date: results for date, results in alldecks.items()
+            if not any(bad in deck for deck in results.values() for bad in bad_cards)}
+len(alldecks)
+alldecks['2016-10-01']
+alldecks = {date: results for date, results in alldecks.items()
+            if not any(bad in deck['mainboard'] for deck in results.values() for bad in bad_cards)}
+len(alldecks)
+get_ipython().magic('run clustering.py')
+pd.sort_values('Distortion', inplace=True)
+pd[pd['Archetype']=='Other 18']
+get_deck(30)
+get_ipython().magic('run clustering.py')
+get_ipython().magic('run clustering.py')
+get_ipython().magic('run clustering.py')
+get_ipython().magic('run clustering.py')
+pd[pd['Archetype']=='Other 18']
+get_deck(102)
+get_deck(122)
+get_ipython().magic('run clustering.py')
+pd[pd['Archetype']=='Other 4']
+pd[pd['Archetype']=='RG Aetherworks Marvel']
+get_ipython().magic('run clustering.py')
+pd[pd['Archetype']=='RG Aetherworks Marvel']
+get_deck(91)
+pd[pd['Archetype']=='RG Aetherworks Marvel 17']
+pd['Archetype'].unique
+pd[pd['Archetype']=='RG Aetherworks Marvel17']
+get_deck(91)
+get_deck(2)
+get_ipython().magic('run clustering.py')
+pd[pd['Archetype']=='RG Aetherworks Marvel18']
+get_deck(5)
+get_deck(616)
+get_deck(547)
+pd[pd['Archetype']=='RG Aetherworks Marvel']
+get_deck(464)
+get_ipython().magic('run clustering.py')
+pd[pd['Archetype']=='Other 3']
+get_deck(30)
+get_deck(365)
+get_ipython().magic('run clustering.py')
+pd[pd['Archetype']=='Other 15']
+get_deck(2)
+get_deck(407)
+get_ipython().magic('run clustering.py')
+pd[pd['Archetype']=='Other 3']
+get_deck(170)
