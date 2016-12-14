@@ -132,7 +132,13 @@ deck_guess = {
                    'Grasp of Darkness':4,
                    'Liliana, the Last Hope':4, 'Sunken Hollow':4,},
     'UR Control': {'Torrential Gearhulk':2, 'Glimmer of Genius':4,
-                   'Harnessed Lightning':4, 'Spirebluff Canal':4, 'Wandering Fumarole':4},
+                   'Harnessed Lightning':4, 'Spirebluff Canal':4, 'Wandering Fumarole':4,
+                   'Void Shatter':4, 'Anticipate':4, 'Negate':4, 'Galvanic Bombardment':4, 'Dynavolt Tower':1},
+    'Jeskai Control': {'Torrential Gearhulk':2, 'Glimmer of Genius':4,
+                       'Blessed Alliance':2, 'Port Town':2, 'Stasis Snare':2, 'Radiant Flames':4,
+                       'Fumigate':2,
+                       'Harnessed Lightning':4, 'Spirebluff Canal':4, 'Wandering Fumarole':4,
+                       'Void Shatter':4, 'Anticipate':4, 'Negate':4, 'Galvanic Bombardment':4},
     'UR Spells': {'Lightning Axe':4, 'Tormenting Voice':4, 'Highland Lake':4, 'Spirebluff Canal':4, 'Thermo-Alchemist':4,
                   'Stormchaser Mage':4, 'Galvanic Bombardment':4, 'Collective Defiance':4, 'Fiery Temper':4, 'Thing in the Ice':2},
     'RB Aggro': {'Fiery Temper':4, 'Bomat Courier':4, 'Unlicensed Disintegration':4,
@@ -162,6 +168,7 @@ deck_guess = {
                           'Hissing Quagmire':2,
                           'Verdurous Gearhulk':2,
                           'Blossoming Defense':2,
+                          'Noose Constrictor':2,
                          },
     'UW Flash': {'Reflector Mage':4, "Gideon, Ally of Zendikar":4,
                  "Smuggler's Copter":4, "Thraben Inspector":4,
@@ -257,9 +264,16 @@ for ii in range(len(deck_guess)+1):
     deck_top20s[ii] = deck
 
     name = None
-    for dk,ks in deck_guess.items():
-        if top20_match(k in deck.keys()[-20:] for k in ks) > 0.9:
+    card_match_fraction = {dk:top20_match(k in deck.keys()[-20:] for k in ks)
+                           for dk,ks in deck_guess.items()}
+    bestfrac = 0
+    for dk, frac in card_match_fraction.items():
+        if frac > bestfrac:
+            bestfrac = frac
             name = dk
+    if bestfrac < 0.8:
+        print("Deck {0}  has bad matches {1}".format(ii, bestfrac))
+        name = None
     if name is None:
         print("Deck {0}: {1} matches, {2}%".format(ii, mask.sum(), mask.sum()/len(mask)))
         deck_ids[ii]=ii
@@ -284,20 +298,21 @@ final = pandas.DataFrame.from_dict(list(deck_50_pct.items()))
 print(final.sort_values(by=1))
 
 
-week_starts = [day for day in daterange(datetime.date(year=2016,month=10,day=1), datetime.date.today(), step=7)]
+timestep=7
+week_starts = [day for day in daterange(datetime.date(year=2016,month=10,day=1), datetime.date.today(), step=timestep)]
 
 weekly_summary = pandas.DataFrame(index=week_starts, columns=deck_guess.keys())
 
 dates = pandas.to_datetime(pd.Date)
 
 for week_start in week_starts:
-    week_end = week_start + datetime.timedelta(7)
+    week_end = week_start + datetime.timedelta(timestep)
     date_matches = (dates>=week_start) & (dates < week_end)
     for deck in deck_guess:
         deck_matches = (pd.Archetype == deck) & date_matches
         weekly_summary[deck][week_start] = deck_matches.sum() / date_matches.sum()
 
-weekly_summary.plot(style=[x+y for x,y in zip('rgbcmykrgbcmykrgbcmyk', ['-']*7 + ['--']*7 + [':']*7)])
+weekly_summary.plot(style=[x+'o'+y for x,y in zip('rgbcmykrgbcmykrgbcmyk', ['-']*7 + ['--']*7 + [':']*7)])
 pl.xlabel("First date in week")
 pl.ylabel("Fraction of 5-0 decks in that week")
 
