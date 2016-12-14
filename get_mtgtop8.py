@@ -1,3 +1,4 @@
+import os
 import requests
 from bs4 import BeautifulSoup
 
@@ -8,6 +9,7 @@ def get_all_deck_urls():
 
     for ii in range(1000):
 
+        print("Loading deck lists for page {0}".format(ii))
         payload = {'date_start':'01/10/2016',
                    'format':'ST',
                    'compet_check[P]':1,
@@ -32,12 +34,27 @@ def get_all_deck_urls():
 
     return all_hrefs
 
-def get_deck(url, base_url="http://mtgtop8.com/event"):
+#def get_deck(url, base_url="http://mtgtop8.com/export_files/deck{0}.mwDeck"):
+def get_deck(deckid, base_url="http://mtgtop8.com/mtgo?d={0}"):
 
-    rslt = requests.get(base_url+url)
+    rslt = requests.get(os.path.join(base_url.format(deckid)))
 
     return rslt
+
+def download_deck(deckid, save=True, path='data/mtgtop8', overwrite=False):
+    rslt = get_deck(deckid)
+    savepath = os.path.join(path, str(deckid))
+    if os.path.exists(savepath) and not overwrite:
+        return
+    else:
+        with open(savepath, 'w') as fh:
+            fh.write(rslt.content)
 
 if __name__ == '__main__':
     all_hrefs = get_all_deck_urls()
     print(all_hrefs)
+
+    for hr in all_hrefs:
+        download_deck(hr[16:22])
+
+    
