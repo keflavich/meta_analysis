@@ -295,6 +295,7 @@ print(len(deck_50_pct), deck_50_pct)
 
 
 final = pandas.DataFrame.from_dict(list(deck_50_pct.items()))
+final.sort_values(by=1, inplace=True)
 print(final.sort_values(by=1))
 
 
