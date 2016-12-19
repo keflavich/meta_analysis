@@ -98,14 +98,19 @@ def get_deck(deckid, base_url="http://mtgtop8.com/mtgo?d={0}"):
 
     return rslt
 
-def download_deck(deckid, eventid, save=True, path='data/mtgtop8', overwrite=False):
+def download_deck(deckid, eventid, save=True, path='data/mtgtop8',
+                  overwrite=False, verbose=False):
     rslt = get_deck(deckid)
     savepath = os.path.join(path, "{0}_{1}".format(eventid, deckid))
     if os.path.exists(savepath) and not overwrite:
+        if verbose:
+            print("Skipping {0}:{1} because it exists".format(eventid,deckid))
         return
     else:
         with open(savepath, 'w') as fh:
             fh.write(rslt.text)
+        if verbose:
+            print("Successfully wrote {0}:{1} to {2}".format(eventid,deckid,savepath))
 
 def read_deck(fn):
     with open(fn,'r') as fh:
@@ -132,10 +137,17 @@ def get_alldecks(event_info, basepath='data/mtgtop8/'):
             date = metadata['Date']
             deckname = metadata['Deck']+metadata['deckid']
 
+            deck_fn = os.path.join(basepath,
+                                   "{0}_{1}".format(metadata['eventid'],
+                                                    metadata['deckid']))
+            if not os.path.exists(deck_fn):
+                download_deck(metadata['deckid'], metadata['eventid'],
+                              verbose=True)
+
             if date in alldecks:
-                alldecks[date][deckname] = read_deck(os.path.join(basepath, metadata['deckid']))
+                alldecks[date][deckname] = read_deck(deck_fn)
             else:
-                alldecks[date] = {deckname:read_deck(os.path.join(basepath, metadata['deckid']))}
+                alldecks[date] = {deckname:read_deck(deck_fn)}
 
     return alldecks
 
