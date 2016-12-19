@@ -194,7 +194,7 @@ deck_guess = {
                                  'Harnessed Lightning':4, 'Attune with Aether':4, 'Vessel of Nascency':4,
                                  'Island':1, 'Forest': 5, 'Mountain':2,
                                  "Woodweaver's Puzzleknot":4,
-                                 "Confiscation Coup":1,
+                                 #"Confiscation Coup":1,
                                  "Evolving Wilds":1,
                              },
     'BG Aetherworks Marvel': {'Aetherworks Marvel':4, 'Emrakul, the Promised End':4, 'Ulamog, the Ceaseless Hunger':2,
@@ -313,9 +313,11 @@ for week_start in week_starts:
         deck_matches = (pd.Archetype == deck) & date_matches
         weekly_summary[deck][week_start] = deck_matches.sum() / date_matches.sum()
 
-weekly_summary.plot(style=[x+'o'+y for x,y in zip('rgbcmykrgbcmykrgbcmyk', ['-']*7 + ['--']*7 + [':']*7)])
+weekly_summary.plot(style=[x+'o'+y for x,y in zip('rgbcmykrgbcmykrgbcmyk', ['-']*7 + ['--']*7 + [':']*7)],
+                    figsize=[24,20])
 pl.xlabel("First date in week")
 pl.ylabel("Fraction of 5-0 decks in that week")
+pl.savefig("MTGO_5-0_meta.png")
 
 
 def get_deck(num):
