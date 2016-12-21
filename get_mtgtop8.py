@@ -144,10 +144,13 @@ def get_alldecks(event_info, basepath='data/mtgtop8/'):
                 download_deck(metadata['deckid'], metadata['eventid'],
                               verbose=True)
 
+            deck_contents = read_deck(deck_fn)
+            deck_contents['eventid'] = eventid
+
             if date in alldecks:
-                alldecks[date][deckname] = read_deck(deck_fn)
+                alldecks[date][deckname] = deck_contents
             else:
-                alldecks[date] = {deckname:read_deck(deck_fn)}
+                alldecks[date] = {deckname:deck_contents}
 
     return alldecks
 
