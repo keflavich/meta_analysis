@@ -27,4 +27,4 @@ if __name__ == "__main__":
 
     alldecks = get_alldecks(event_info)
 
-    pd, get_deck, deck_50_pct, deck_ids, deck_top20s = do_clustering(alldecks, prefix='MTGTOP8')
+    pd, get_deck, deck_50_pct, deck_ids, deck_top20s, deck_counts = do_clustering(alldecks, prefix='MTGTOP8')

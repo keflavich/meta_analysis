@@ -9,11 +9,14 @@ import datetime
 def get_all_event_info(fmt='Standard', max_pages=10,
                        savefile='data/mtg-leagues/meta.json',
                        earliest_date=datetime.datetime(year=2016, month=10, day=1),
+                       use_cached=False,
                       ):
 
     if os.path.exists(savefile):
         with open(savefile, 'r') as fh:
             event_info = json.load(fh)
+        if use_cached:
+            return event_info
     else:
         event_info = {}
 

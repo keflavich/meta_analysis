@@ -21,10 +21,16 @@ deck_guess = {
     'Jeskai Control': {'Torrential Gearhulk':2, 'Glimmer of Genius':4,
                        'Blessed Alliance':2, 'Port Town':2, 'Stasis Snare':2, 'Radiant Flames':4,
                        'Fumigate':2,
+                       'Aether Hub': 4,
+                       'Nahiri, the Harbinger': 2,
                        'Harnessed Lightning':4, 'Spirebluff Canal':4, 'Wandering Fumarole':4,
                        'Void Shatter':4, 'Anticipate':4, 'Negate':4, 'Galvanic Bombardment':4},
     'UR Spells': {'Lightning Axe':4, 'Tormenting Voice':4, 'Highland Lake':4, 'Spirebluff Canal':4, 'Thermo-Alchemist':4,
                   'Stormchaser Mage':4, 'Galvanic Bombardment':4, 'Collective Defiance':4, 'Fiery Temper':4, 'Thing in the Ice':2},
+    'GW Aggro': {"Archangel Avacyn":4, "Gideon, Ally of Zendikar": 4, "Tireless Tracker": 4, "Sylvan Advocate": 4,
+                 'Declaration in Stone': 2, 'Fortified Village': 2, 'Thraben Inspector':4, 'Selfless Spirit':2,
+                 'Verdurous Gearhulk': 2,
+                 "Smuggler's Copter":4},
     'RB Aggro': {'Fiery Temper':4, 'Bomat Courier':4, 'Unlicensed Disintegration':4,
                  "Smuggler's Copter":4},
     'RG Energy Aggro': {'Servant of the Conduit':4, 'Attune with Aether':4,
@@ -115,6 +121,10 @@ deck_guess = {
                            "Prophetic Prism":4,
                           },
     #'BW': {"Ayli, Eternal Pilgrim": 4, "Shambling Vent":4, "Forsaken Sanctuary": 2, "Concealed Courtyard": 4,},
+    'BW Control': {"Kalitas, Traitor of Ghet": 4, "Shambling Vent":4,  "Concealed Courtyard": 4,
+                   'Anguished Unmaking':3, 'Grasp of Darkness':2, 'Gideon, Ally of Zendikar': 2, 'Ruinous Path':2,
+                   'Liliana, the Last Hope': 2, 'Sorin, Grim Nemesis':2, 'Fumigate':1,
+                  },
     'Mardu Control': {'Liliana, the Last Hope':4, 'Mountain':4, 'Swamp':4, 'Smoldering Marsh':2, 'Kalitas, Traitor of Ghet':2,
                       'Noxious Gearhulk':2, 'Goblin Dark-Dwellers':2, 'Nahiri, the Harbinger':2, 'Grasp of Darkness':2,
                       'Chandra, Torch of Defiance':2, 'Ruinous Path':2,},
@@ -130,13 +140,23 @@ def do_clustering(alldecks, prefix="MTGTOP8"):
                          for deck in dailies.values()
                          for card in deck['mainboard'] if card.lower() in standard_legal)
 
+    lowercase_decks = {date: {key:
+                              {board: ({card.lower():deck[board][card] for card in deck[board]}
+                                       if board not in ('eventid', 'record')
+                                       else deck[board])
+                               for board in deck}
+                              for key,deck in results.items()}
+                       for date, results in alldecks.items()}
+
+
+
     legaldecks = {date: results
-                  for date, results in alldecks.items()
+                  for date, results in lowercase_decks.items()
                   if not any(card.lower() not in standard_legal for deck in results.values() for card in deck['mainboard'])}
     illegalcards = {date: {user: ([card for card in deck['mainboard'] if card.lower() not in standard_legal], deck['eventid'])
                            for user,deck in results.items()
                            if any([card for card in deck['mainboard'] if card.lower() not in standard_legal])
-                          } for date,results in alldecks.items()
+                          } for date,results in lowercase_decks.items()
                     if any(card.lower() not in standard_legal for deck in results.values() for card in deck['mainboard'])}
 
     deckcount = sum(len(x) for x in legaldecks.values())
@@ -270,6 +290,7 @@ def do_clustering(alldecks, prefix="MTGTOP8"):
     cluster_membership = code
 
     deck_50_pct = {}
+    deck_counts = {}
     deck_top20s = {}
     deck_ids = {}
 
@@ -295,13 +316,14 @@ def do_clustering(alldecks, prefix="MTGTOP8"):
             if frac > bestfrac:
                 bestfrac = frac
                 name = dk
-        if bestfrac < 0.8:
-            print("Deck {0}  has bad matches {1}".format(ii, bestfrac))
+        if bestfrac < 0.7:
+            print("### Deck {0} has bad matches {1}".format(ii, bestfrac))
             name = None
         if name is None:
-            print("Deck {0}: {1} matches, {2}%".format(ii, mask.sum(), mask.sum()/len(mask)))
+            print("Deck {0}: {1} matches, {2:0.2f}% of total".format(ii, mask.sum(), mask.sum()/len(mask)*100))
             deck_ids[ii]=ii
             deck_50_pct[ii] = mask.sum()/len(mask)
+            deck_counts[ii] = mask.sum()
             pd.ix[mask, 'Archetype'] = "Other "+str(ii)
         else:
             if name in deck_50_pct:
@@ -310,7 +332,8 @@ def do_clustering(alldecks, prefix="MTGTOP8"):
             else:
                 pd.ix[mask, 'Archetype'] = name
             deck_50_pct[name] = mask.sum()/len(mask)
-            print("Deck {0}={2}: {1} matches, {3}%".format(ii, mask.sum(), name, mask.sum()/len(mask)))
+            deck_counts[name] = mask.sum()
+            print("Deck {0}={2}: {1} matches, {3:0.2f}% of total".format(ii, mask.sum(), name, mask.sum()/len(mask)*100))
             deck_ids[name]=ii
             #pd['Archetype'][mask] = name
         #print(deck[-20:])
@@ -318,7 +341,7 @@ def do_clustering(alldecks, prefix="MTGTOP8"):
     print(len(deck_50_pct), deck_50_pct)
 
 
-    final = pandas.DataFrame.from_dict(list(deck_50_pct.items()))
+    final = pandas.DataFrame.from_dict([(name, deck_50_pct[name], deck_counts[name]) for name in deck_50_pct])
     final.sort_values(by=1, inplace=True)
     print(final.sort_values(by=1))
 
@@ -339,14 +362,15 @@ def do_clustering(alldecks, prefix="MTGTOP8"):
             deck_matches = (pd.Archetype == deck) & date_matches
             weekly_summary[deck][week_start] = deck_matches.sum() / date_matches.sum()
 
-    weekly_summary.plot(style=[x+'o'+y for x,y in zip('rgbcmykrgbcmykrgbcmyk', ['-']*7 + ['--']*7 + [':']*7)],
+    weekly_summary.plot(style=[x+'o'+y for x,y in zip('rgbcmykrgbcmykrgbcmykrgbcmyk', ['-']*7 + ['--']*7 + [':']*7 + ['-.']*7)],
                         figsize=[24,20])
     pl.xlabel("First date in week")
     pl.ylabel("Fraction decks in that week")
+    pl.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     pl.savefig("{prefix}_meta.png".format(prefix=prefix))
 
     def get_deck(num):
         deck = pd.loc[num]
         return deck[deck!=0]
 
-    return pd, get_deck, deck_50_pct, deck_ids, deck_top20s
+    return pd, get_deck, deck_50_pct, deck_ids, deck_top20s, deck_counts
