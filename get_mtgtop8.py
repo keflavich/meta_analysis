@@ -4,7 +4,7 @@ import os
 import requests
 from bs4 import BeautifulSoup
 
-def get_event_info():
+def get_event_info(start_date='01/10/2016'):
     #all_hrefs = []
 
     event_info = {}
@@ -14,7 +14,7 @@ def get_event_info():
     for ii in range(1000):
 
         print("Loading deck lists for page {0}".format(ii))
-        payload = {'date_start':'01/10/2016',
+        payload = {'date_start':start_date,
                    'format':'ST',
                    'compet_check[P]':1,
                    'compet_check[M]':1,
@@ -50,7 +50,7 @@ def get_event_info():
                     break
                 cols = row.findAll('td')
                 this_deck = {nm: col.get_text() for nm,col in zip(colnames, cols)
-                              if nm}
+                             if nm}
 
 
 

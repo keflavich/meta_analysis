@@ -8,132 +8,16 @@ import pylab as pl
 import scipy.cluster
 from standard_cardlist import get_standard_legal
 
-deck_guess = {
-    'UW Panharmonicon': {'Panharmonicon':4, 'Cloudblazer':4, 'Glint-Nest Crane':4, 'Eldrazi Displacer':4, 'Drowner of Hope':2},
-    'UW Control': {'Torrential Gearhulk':4, 'Glimmer of Genius':4,
-                   'Immolating Glare':2, 'Blessed Alliance':2, 'Prairie Stream':4},
-    'UB Control': {'Torrential Gearhulk':4, 'Glimmer of Genius':4,
-                   'Grasp of Darkness':4,
-                   'Liliana, the Last Hope':4, 'Sunken Hollow':4,},
-    'UR Control': {'Torrential Gearhulk':2, 'Glimmer of Genius':4,
-                   'Harnessed Lightning':4, 'Spirebluff Canal':4, 'Wandering Fumarole':4,
-                   'Void Shatter':4, 'Anticipate':4, 'Negate':4, 'Galvanic Bombardment':4, 'Dynavolt Tower':1},
-    'Jeskai Control': {'Torrential Gearhulk':2, 'Glimmer of Genius':4,
-                       'Blessed Alliance':2, 'Port Town':2, 'Stasis Snare':2, 'Radiant Flames':4,
-                       'Fumigate':2,
-                       'Aether Hub': 4,
-                       'Nahiri, the Harbinger': 2,
-                       'Harnessed Lightning':4, 'Spirebluff Canal':4, 'Wandering Fumarole':4,
-                       'Void Shatter':4, 'Anticipate':4, 'Negate':4, 'Galvanic Bombardment':4},
-    'UR Spells': {'Lightning Axe':4, 'Tormenting Voice':4, 'Highland Lake':4, 'Spirebluff Canal':4, 'Thermo-Alchemist':4,
-                  'Stormchaser Mage':4, 'Galvanic Bombardment':4, 'Collective Defiance':4, 'Fiery Temper':4, 'Thing in the Ice':2},
-    'GW Aggro': {"Archangel Avacyn":4, "Gideon, Ally of Zendikar": 4, "Tireless Tracker": 4, "Sylvan Advocate": 4,
-                 'Declaration in Stone': 2, 'Fortified Village': 2, 'Thraben Inspector':4, 'Selfless Spirit':2,
-                 'Verdurous Gearhulk': 2,
-                 "Smuggler's Copter":4},
-    'RB Aggro': {'Fiery Temper':4, 'Bomat Courier':4, 'Unlicensed Disintegration':4,
-                 "Smuggler's Copter":4},
-    'RG Energy Aggro': {'Servant of the Conduit':4, 'Attune with Aether':4,
-                        'Longtusk Cub':4, 'Voltaic Brawler':4,
-                        'Bristling Hydra':4},
-    'Grixis Graveyard Emerge': {'Elder Deep-Fiend':4, "Kozilek's Return":4,
-                                "Prized Amalgam":4, "Cathartic Reunion":4,
-                                "Haunted Dead":4, "Wretched Gryff":1},
-    'BG Delirium Control': {"Liliana, the Last Hope":4, 'Grim Flayer':4,
-                            'Ishkanah, Grafwidow':4,
-                            'Grasp of Darkness':4, 'Vessel of Nascency':4,
-                            'Emrakul, the Promised End': 2,
-                            'Grapple with the Past': 4,
-                            "Pilgrim's Eye":1,
-                            'Noxious Gearhulk':1, 'Ruinous Path':1},
-    'BG Delirium Aggro': {"Smuggler's Copter":4, 'Grim Flayer':4,
-                          'Ishkanah, Grafwidow':4,
-                          "Liliana, the Last Hope":4,
-                          'Grasp of Darkness':4, 'Gnarlwood Dryad':4,
-                          'Sylvan Advocate': 2,
-                          'Dead Weight':2,
-                          'Scrapheap Scrounger':2,
-                          'Mindwrack Demon':2,
-                          'Tireless Tracker':2,
-                          'Hissing Quagmire':2,
-                          'Verdurous Gearhulk':2,
-                          'Blossoming Defense':2,
-                          'Noose Constrictor':2,
-                         },
-    'UW Flash': {'Reflector Mage':4, "Gideon, Ally of Zendikar":4,
-                 "Smuggler's Copter":4, "Thraben Inspector":4,
-                 "Prairie Stream":4},
-    'RW Vehicle Aggro': {"Smuggler's Copter":4, "Inspiring Vantage":4,
-                         "Pia Nalaar":4, "Toolcraft Exemplar":4,
-                         "Selfless Spirit": 4,
-                         "Declaration in Stone":4,
-                         "Veteran Motorist":4,
-                         "Thraben Inspector":4},
-    'Mardu Vehicle Aggro': {"Cultivator's Caravan":3, "Concealed Courtyard":4,
-                            "Scrapheap Scrounger":4, "Smuggler's Copter":4,
-                            "Veteran Motorist":4,
-                            "Inspiring Vantage":4, "Toolcraft Exemplar":4,
-                            "Thraben Inspector":4},
-    'RG Aetherworks Marvel': {'Aetherworks Marvel':4, 'Emrakul, the Promised End':4, 'Ulamog, the Ceaseless Hunger':2,
-                              'Harnessed Lightning':4, 'Attune with Aether':4, 'Vessel of Nascency':4,
-                              'Forest':8, 'Mountain':4, 'Game Trail':4,
-                              "Woodweaver's Puzzleknot":4,
-                             },
-    'Temur Aetherworks Marvel': {'Aetherworks Marvel':4, 'Emrakul, the Promised End':4, 'Ulamog, the Ceaseless Hunger':2,
-                                 'Whirler Virtuoso': 4, 'Botanical Sanctum': 3, 'Spirebluff Canal': 3,
-                                 'Harnessed Lightning':4, 'Attune with Aether':4, 'Vessel of Nascency':4,
-                                 'Island':1, 'Forest': 5, 'Mountain':2,
-                                 "Woodweaver's Puzzleknot":4,
-                                 "Confiscation Coup":1,
-                                 "Evolving Wilds":1,
-                             },
-    'UG Aetherworks Marvel': {'Aetherworks Marvel':4, 'Emrakul, the Promised End':4, 'Ulamog, the Ceaseless Hunger':2,
-                              'Botanical Sanctum': 3,
-                              'Attune with Aether':4, 'Vessel of Nascency':4,
-                              'Island':1, 'Forest': 5,
-                              "Woodweaver's Puzzleknot":4,
-                              "Glimmer of Genius":4,
-                              "Lumbering Falls":4,
-                              "Confiscation Coup":1,
-                              "Glassblower's Puzzleknot":1,
-                              "Evolving Wilds":1,
-                             },
-    'BG Aetherworks Marvel': {'Aetherworks Marvel':4, 'Emrakul, the Promised End':4, 'Ulamog, the Ceaseless Hunger':2,
-                              'Attune with Aether':4, 'Vessel of Nascency':4,
-                              'Forest':8, 'Swamp':4,
-                              'To the Slaughter':2, 'Noxious Gearhulk':2, 'Grasp of Darkness':2, 'Blooming Marsh':2,
-                              "Servant of the Conduit":2,
-                              "Woodweaver's Puzzleknot":4,
-                             },
-    'Bux Graveyard': {'Haunted Dead':4, 'Prized Amalgam':4, 'Voldaren Pariah':4, 'Cryptbreaker':4,
-                     },
-    'Metalwork Colossus': {'Metalwork Colossus':4,
-                           'Glint-Nest Crane':4,
-                           'Sanctum of Ugin':4,
-                           "Inventors' Fair":4,
-                           "Metalspinner's Puzzleknot":4,
-                           "Hedron Archive":4,
-                           "Skysovereign, Consul Flagship":1,
-                           "Foundry Inspector":2,
-                           "Spatial Contortion":2,
-                           "Cultivator's Caravan":2,
-                           "Elder Deep-Fiend":2,
-                           "Prophetic Prism":4,
-                          },
-    #'BW': {"Ayli, Eternal Pilgrim": 4, "Shambling Vent":4, "Forsaken Sanctuary": 2, "Concealed Courtyard": 4,},
-    'BW Control': {"Kalitas, Traitor of Ghet": 4, "Shambling Vent":4,  "Concealed Courtyard": 4,
-                   'Anguished Unmaking':3, 'Grasp of Darkness':2, 'Gideon, Ally of Zendikar': 2, 'Ruinous Path':2,
-                   'Liliana, the Last Hope': 2, 'Sorin, Grim Nemesis':2, 'Fumigate':1,
-                  },
-    'Mardu Control': {'Liliana, the Last Hope':4, 'Mountain':4, 'Swamp':4, 'Smoldering Marsh':2, 'Kalitas, Traitor of Ghet':2,
-                      'Noxious Gearhulk':2, 'Goblin Dark-Dwellers':2, 'Nahiri, the Harbinger':2, 'Grasp of Darkness':2,
-                      'Chandra, Torch of Defiance':2, 'Ruinous Path':2,},
-}
+from KLD_archetypes import deck_guess as KLD_deck_guess
+from deck_guess_AER import deck_guess as AER_deck_guess
 
-
-def do_clustering(alldecks, prefix="MTGTOP8"):
+def do_clustering(alldecks, prefix="MTGTOP8", deck_guess=KLD_deck_guess,
+                  start_date=datetime.date(year=2016,month=10,day=1),
+                  timestep=7,
+                  standard_set_savename='data/standard_legal.json',
+                 ):
     
-    standard_legal = [x.lower() for x in get_standard_legal()]
+    standard_legal = [x.lower() for x in get_standard_legal(savename=standard_set_savename)]
 
     card_namespace = set(card.lower()
                          for dailies in alldecks.values()
@@ -273,7 +157,8 @@ def do_clustering(alldecks, prefix="MTGTOP8"):
     for ii,(deckname, deck) in enumerate(deck_guess.items()):
         for card in deck:
             if card.lower() not in pd.columns:
-                raise ValueError("Card {0} is not real".format(card))
+                print("Deck {0} is not represented in the meta".format(deckname))
+                #raise ValueError("Card {0} is not real".format(card))
             guess_array[ii,justdata.T.keys() == card.lower()] = deck[card] + 10
 
 
@@ -346,8 +231,7 @@ def do_clustering(alldecks, prefix="MTGTOP8"):
     print(final.sort_values(by=1))
 
 
-    timestep=7
-    week_starts = [day for day in daterange(datetime.date(year=2016,month=10,day=1), datetime.date.today(), step=timestep)]
+    week_starts = [day for day in daterange(start_date, datetime.date.today(), step=timestep)]
 
     weekly_summary = pandas.DataFrame(index=week_starts, columns=deck_guess.keys())
 
