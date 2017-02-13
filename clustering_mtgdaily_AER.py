@@ -146,6 +146,7 @@ for week_start in week_starts:
 
 weekly_summary.plot(style=[x+'o'+y for x,y in zip('rgbcmykrgbcmykrgbcmyk', ['-']*7 + ['--']*7 + [':']*7)],
                     figsize=[24,20])
+pl.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
 pl.xlabel("First date in week")
 pl.ylabel("Fraction of 5-0 decks in that week")
 pl.savefig("MTGO_5-0_meta.png")
