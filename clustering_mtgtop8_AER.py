@@ -32,6 +32,6 @@ if __name__ == "__main__":
      deck_counts) = do_clustering(alldecks, prefix='MTGTOP8',
                                   deck_guess=AER_deck_guess,
                                   start_date=datetime.date(year=2017,month=1,day=25),
-                                  timestep=1,
+                                  timestep=3,
                                   standard_set_savename='data/AER_standard_legal.json',
                                  )

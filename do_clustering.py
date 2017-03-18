@@ -250,8 +250,8 @@ def do_clustering(alldecks, prefix="MTGTOP8", deck_guess=KLD_deck_guess,
                         figsize=[24,20])
     pl.xlabel("First date in week")
     pl.ylabel("Fraction decks in that week")
-    pl.legend(loc='center left', bbox_to_anchor=(1.5, 0.5))
-    pl.savefig("{prefix}_meta.png".format(prefix=prefix))
+    pl.legend(loc='center left', bbox_to_anchor=(1.05, 0.5))
+    pl.savefig("{prefix}_meta.png".format(prefix=prefix), bbox_inches='tight')
 
     def get_deck(num):
         deck = pd.loc[num]

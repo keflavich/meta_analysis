@@ -149,7 +149,7 @@ weekly_summary.plot(style=[x+'o'+y for x,y in zip('rgbcmykrgbcmykrgbcmyk', ['-']
 pl.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
 pl.xlabel("First date in week")
 pl.ylabel("Fraction of 5-0 decks in that week")
-pl.savefig("MTGO_5-0_meta.png")
+pl.savefig("MTGO_5-0_meta.png", bbox_inches='tight')
 
 
 def get_deck(num):
