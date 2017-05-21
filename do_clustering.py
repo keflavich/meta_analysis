@@ -10,14 +10,20 @@ from standard_cardlist import get_standard_legal
 
 from KLD_archetypes import deck_guess as KLD_deck_guess
 from deck_guess_AER import deck_guess as AER_deck_guess
+from deck_guess_AKH import deck_guess as AKH_deck_guess
 
 def do_clustering(alldecks, prefix="MTGTOP8", deck_guess=KLD_deck_guess,
                   start_date=datetime.date(year=2016,month=10,day=1),
                   timestep=7,
                   standard_set_savename='data/standard_legal.json',
+                  forced_legal=[],
+                  card_to_check=None,
                  ):
     
-    standard_legal = [x.lower() for x in get_standard_legal(savename=standard_set_savename)]
+    standard_legal = [x.lower() for x in get_standard_legal(savename=standard_set_savename,
+                                                            forced_legal=forced_legal)]
+    if card_to_check is not None:
+        assert card_to_check in standard_legal
 
     card_namespace = set(card.lower()
                          for dailies in alldecks.values()
@@ -25,7 +31,10 @@ def do_clustering(alldecks, prefix="MTGTOP8", deck_guess=KLD_deck_guess,
                          for card in deck['mainboard'] if card.lower() in standard_legal)
 
     lowercase_decks = {date: {key:
-                              {board: ({card.lower():deck[board][card] for card in deck[board]}
+                              {board: ({(card.lower() if '/' not in card else
+                                         card.lower().split("/")[0].strip()):
+                                        deck[board][card]
+                                        for card in deck[board]}
                                        if board not in ('eventid', 'record')
                                        else deck[board])
                                for board in deck}

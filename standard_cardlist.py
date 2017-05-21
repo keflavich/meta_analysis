@@ -4,7 +4,8 @@ import os
 import requests
 import zipfile
 
-def get_standard_legal(savename='data/standard_legal.json'):
+def get_standard_legal(savename='data/standard_legal.json',
+                       forced_legal=[]):
     if os.path.exists(savename):
         with open(savename,'r') as fh:
             return json.load(fh)
@@ -22,17 +23,21 @@ def get_standard_legal(savename='data/standard_legal.json'):
     for setname in allsets:
 
         for card in allsets[setname]['cards']:
-            if 'legalities' not in card:
+            if 'legalities' not in card and setname not in forced_legal:
                 continue
-
-            legal = [legality['legality'] == 'Legal'
-                     for legality in card['legalities']
-                     if legality['format'] == 'Standard']
-            if legal:
-                standard_cards.append(card['name'])
+            elif setname in forced_legal:
                 set_legal = True
+                standard_cards.append(card['name'])
+                print("Found {0} in forced_legal".format(card['name']))
             else:
-                set_legal = False
+                legal = [legality['legality'] == 'Legal'
+                         for legality in card['legalities']
+                         if legality['format'] == 'Standard']
+                if legal:
+                    standard_cards.append(card['name'])
+                    set_legal = True
+                else:
+                    set_legal = False
 
         if not(set_legal):
             print("Set {0} is not legal in standard".format(setname))
